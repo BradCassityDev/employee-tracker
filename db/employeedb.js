@@ -7,9 +7,20 @@ class DB {
     }
 
     // view all departments (name and id)
-    viewAllDepartments() {
+    async viewAllDepartments() {
+        const sql = `SELECT * FROM department`;
+        return await this.connection
+                .query(sql, function(err, rows) {
+                    if(err) throw error;
+
+                    return rows;
+                });
+    }
+
+    // return department names
+    viewDepartmentNames() {
         return this.connection.promise()
-                .query(`SELECT * FROM department`);
+                .query(`SELECT name FROM department`);
     }
 
     // view all roles (job title, role id, department name, and salary)
@@ -27,6 +38,27 @@ class DB {
                     LEFT JOIN role ON employee.role_id = role.id 
                     LEFT JOIN department ON role.department_id = department.id
                     LEFT JOIN employee AS manager ON employee.manager_id = manager.id`);
+    }
+
+    // Add department
+    addDepartment(departmentName) {
+        const sql = `INSERT INTO department (name) VALUES (?)`;
+        const params = [departmentName];
+        const result = this.connection.promise().query(
+            sql,
+            params,
+            function(err, res) {
+              if (err) throw err;
+            }
+          );
+          
+        return result;
+    }
+
+    // Add role
+    addRole(role) {
+        const sql = ``;
+        
     }
 
 
