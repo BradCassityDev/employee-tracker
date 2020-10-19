@@ -13,15 +13,6 @@ class DB {
         return this.connection.promise().query(sql);
     }
 
-    // return department names
-    findDeptByName(name) {
-        const sql = `SELECT id FROM department WHERE name = ?`;
-        const params = [name];
-        const result = this.connection.promise().query(sql, params);
-
-        return result;
-    }
-
     // view all roles (job title, role id, department name, and salary)
     viewAllRoles() {
         return this.connection.promise()
@@ -57,13 +48,35 @@ class DB {
     // Add role
     addRole(role) {
         const sql = `INSERT INTO role SET ?`;
-        const params = {
-            title: role.name,
-            salary: role.salary,
-            department_id: role.selectedDeptId
-        };
+        const params = role;
         return this.connection.promise().query(sql, params);
     }
+
+    // Add Employee
+    addEmployee(employee) {
+        const sql = `INSERT INTO employee SET ?`;
+        const params = employee;
+
+        return this.connection.promise().query(sql, params);
+        
+    }
+
+    updateEmployeeRole(employee) {
+        const {id, role_id} = employee;
+        const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
+        const params = [
+            role_id,
+            id
+        ];
+
+        return this.connection.promise().query(sql, params);
+    }
+
+    // Update Employee Manager
+    updateEmployeeManager(employee, manager) {
+        
+    }
+
 
 
     employees() {
