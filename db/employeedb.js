@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+//const mysql = require('mysql2/promise');
 const dbConfig = require('../db/connection');
 
 class DB {
@@ -7,20 +8,18 @@ class DB {
     }
 
     // view all departments (name and id)
-    async viewAllDepartments() {
+    viewAllDepartments() {
         const sql = `SELECT * FROM department`;
-        return await this.connection
-                .query(sql, function(err, rows) {
-                    if(err) throw error;
-
-                    return rows;
-                });
+        return this.connection.promise().query(sql);
     }
 
     // return department names
-    viewDepartmentNames() {
-        return this.connection.promise()
-                .query(`SELECT name FROM department`);
+    findDeptByName(name) {
+        const sql = `SELECT id FROM department WHERE name = ?`;
+        const params = [name];
+        const result = this.connection.promise().query(sql, params);
+
+        return result;
     }
 
     // view all roles (job title, role id, department name, and salary)
@@ -57,8 +56,13 @@ class DB {
 
     // Add role
     addRole(role) {
-        const sql = ``;
-        
+        const sql = `INSERT INTO role SET ?`;
+        const params = {
+            title: role.name,
+            salary: role.salary,
+            department_id: role.selectedDeptId
+        };
+        return this.connection.promise().query(sql, params);
     }
 
 

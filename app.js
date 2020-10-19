@@ -6,15 +6,14 @@ const DB = require('./db/employeedb');
 
 const addPrompts = (obj) => {
     return inquirer.prompt(obj)
-        .then(result => {
-            return result;
+        .then(responses => {
+            return responses;
         })
         .catch(err => {
             console.log(err);
             return false;
         });
 }
-
 
 const mainMenu = (db) => {
     inquirer.prompt([
@@ -59,9 +58,13 @@ const mainMenu = (db) => {
                 console.log(`${result.department} has been added as a new department!`);
             }
         } else if (result.menu === 'add a role') {
-            const departments = await db.viewDepartmentNames();
-            console.log(departments[0]);
+            const departments = await db.viewAllDepartments();
+            let names =[];
+            departments[0].forEach(row => {
+                names.push(row.name);
+            });
 
+            console.log(names);
             const questions = [
                     {
                         type: 'input',
@@ -69,18 +72,28 @@ const mainMenu = (db) => {
                         message: 'What is the role name?'
                     }, 
                     {
-                        type: 'input',
+                        type: 'number',
                         name: 'salary',
                         message: 'What is the salary?'
                     },
                     {
                         type: 'list',
-                        name: 'department',
+                        name: 'department_name',
                         message: 'What department does this role belong to?',
-                        choices: departments
+                        choices: names
                     }
                 ];
+            
             const result = await addPrompts(questions);
+            const deptId = await db.findDeptByName(result.department_name);
+
+            result.selectedDeptId = deptId[0][0].id;
+            console.log(result);
+
+            if(result) {
+                const returned = await db.addRole(result);
+                console.log('New role added!');
+            }
 
         } else if (result.menu === 'add an employee') {
 
@@ -106,13 +119,10 @@ const mainMenu = (db) => {
 };
 
 
-
+// Open db connection and go to main menu
 const initiateApp = () => {
     const db = new DB(connection);
-    // db.addDepartment('test');
-    // closeDb(db);
     mainMenu(db);
-    
 }
 
 // Close connection to db
@@ -120,5 +130,5 @@ const closeDb = (db) => {
     db.endConnection();
 };
 
+// Initiate the program
 initiateApp();
-
