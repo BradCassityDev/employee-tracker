@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const dbConfig = require('../db/connection');
 
 class DB {
+    // DB Constructor
     constructor(connection) {
         this.connection = connection;
     }
@@ -61,6 +62,7 @@ class DB {
         
     }
 
+    // Update employee role
     updateEmployeeRole(employee) {
         const {id, role_id} = employee;
         const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
@@ -74,13 +76,10 @@ class DB {
 
     // Update Employee Manager
     updateEmployeeManager(employee, manager) {
-        
-    }
+        const sql = `UPDATE employee SET manager_id = ? WHERE id = ?`;
+        const params = [manager, employee];
 
-
-
-    employees() {
-        return this.connection.promise().query('SELECT * FROM employee');
+        return this.connection.promise().query(sql, params);
     }
 
     // End connection
